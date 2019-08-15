@@ -1,0 +1,45 @@
+---
+version: '2.4'
+services:
+
+    elasticsearch:
+        image: ${ELASTICSEARCH_IMAGE}
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        environment:
+            ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+        networks:
+            - elk
+
+    logstash:
+        build:
+            context: ./logstash
+            args:
+                LOGSTASH_IMAGE: ${LOGSTASH_IMAGE}
+        volumes:
+            - ./logstash/pipeline/wikipedia.conf:/etc/logstash/conf.d/logstash.conf:ro
+            - ./dataset/wikipedia/enwiki-20190801-pages-articles1.xml-p10p30302.bz2:/enwiki.xml.bz2
+        stdin_open: true
+        tty: true
+        environment:
+            LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+        networks:
+            - elk
+        depends_on:
+            - elasticsearch
+
+    kibana:
+        image: ${KIBANA_IMAGE}
+        environment:
+            ELASTICSEARCH_URL: http://elasticsearch:9200
+        ports:
+            - "5601:5601"
+        networks:
+            - elk
+        depends_on:
+            - elasticsearch
+
+networks:
+    elk:
+        driver: bridge

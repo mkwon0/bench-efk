@@ -1,0 +1,17 @@
+---
+version: '2.4'
+services:
+
+    elasticsearch:
+        image: ${ELASTICSEARCH_IMAGE}
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        environment:
+            ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+        networks:
+            - elk
+
+networks:
+    elk:
+        driver: bridge

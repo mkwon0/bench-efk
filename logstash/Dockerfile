@@ -1,0 +1,7 @@
+ARG LOGSTASH_IMAGE
+FROM $LOGSTASH_IMAGE
+
+USER root
+RUN yum install -y bzip2
+
+ENTRYPOINT ["/bin/bash"]
